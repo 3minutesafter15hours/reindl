@@ -810,7 +810,7 @@
         let aliasCounts = {};
 
         for (const [workerId, data] of Object.entries(wrestlersSource)) {
-            if (data.timeline && data.timeline.length >= 2) {
+            if (data.timeline && data.timeline.length >= 4) {
                 WRESTLER_DB[workerId] = data;
                 const aliases = data.aliases || [data.name];
                 aliases.forEach(alias => {
