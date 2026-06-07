@@ -272,6 +272,7 @@
             border: 1px solid #cccccc;
             padding: 15px;
             box-sizing: border-box;
+            margin-bottom: 25px;
         }
         
         .autocomplete-wrapper { 
@@ -344,6 +345,140 @@
             text-align: center;
             padding: 40px;
         }
+
+        /* Stats Chart & Dashboard styling */
+        .stats-dashboard {
+            background-color: #f9f9f9;
+            border: 1px solid #cccccc;
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+        }
+        .stats-summary-grid {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .stat-metric-box .metric-val {
+            font-size: 22px;
+            font-weight: bold;
+            color: #03328a;
+        }
+        .stat-metric-box .metric-label {
+            font-size: 11px;
+            color: #666666;
+            text-transform: uppercase;
+        }
+        .chart-distribution-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+        .chart-row {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+        .chart-label {
+            width: 20px;
+            font-weight: bold;
+        }
+        .chart-bar-bg {
+            flex-grow: 1;
+            background-color: #eeeeee;
+            height: 18px;
+            margin-left: 10px;
+            position: relative;
+        }
+        .chart-bar-fill {
+            background-color: #03328a;
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 5px;
+            box-sizing: border-box;
+        }
+        .chart-bar-count {
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Calendar Matrix Grid Layout */
+        .calendar-matrix-container {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            margin-bottom: 20px;
+        }
+        .calendar-month-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #03328a;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+        .calendar-day-header {
+            font-size: 10px;
+            font-weight: bold;
+            color: #666666;
+            padding-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .calendar-cell {
+            font-size: 11px;
+            padding: 6px 0;
+            border: 1px solid #eeeeee;
+            background-color: #fcfcfc;
+            color: #999999;
+            font-weight: bold;
+        }
+        .calendar-cell.active-day {
+            color: #000000;
+            background-color: #f0f0f0;
+            border-color: #cccccc;
+        }
+        .calendar-cell.status-win {
+            background-color: #d4edda !important;
+            color: #155724 !important;
+            border-color: #c3e6cb !important;
+        }
+        .calendar-cell.status-loss {
+            background-color: #f8d7da !important;
+            color: #721c24 !important;
+            border-color: #f5c6cb !important;
+        }
+
+        /* Modern Countdown UI */
+        .countdown-strip-box {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid #000000;
+        }
+        .countdown-time-digits {
+            color: #cc9900;
+            font-family: Courier, monospace;
+            font-size: 16px;
+            margin-left: 5px;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
@@ -396,6 +531,48 @@
                 <button id="submitBtn" onclick="submitGuess()">Search</button>
             </div>
 
+            <div id="statsDashboard" class="stats-dashboard">
+                <div class="section-sub-bar" style="margin-bottom: 15px;">Your Lifetime History Stats</div>
+                <div class="stats-summary-grid">
+                    <div class="stat-metric-box">
+                        <div id="statPlayed" class="metric-val">0</div>
+                        <div class="metric-label">Played</div>
+                    </div>
+                    <div class="stat-metric-box">
+                        <div id="statWinPct" class="metric-val">0%</div>
+                        <div class="metric-label">Win %</div>
+                    </div>
+                    <div class="stat-metric-box">
+                        <div id="statCurrentStreak" class="metric-val">0</div>
+                        <div class="metric-label">Current Streak</div>
+                    </div>
+                    <div class="stat-metric-box">
+                        <div id="statMaxStreak" class="metric-val">0</div>
+                        <div class="metric-label">Max Streak</div>
+                    </div>
+                </div>
+
+                <div class="chart-distribution-container">
+                    <div class="chart-row"><div class="chart-label">1</div><div class="chart-bar-bg"><div id="bar1" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
+                    <div class="chart-row"><div class="chart-label">2</div><div class="chart-bar-bg"><div id="bar2" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
+                    <div class="chart-row"><div class="chart-label">3</div><div class="chart-bar-bg"><div id="bar3" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
+                    <div class="chart-row"><div class="chart-label">4</div><div class="chart-bar-bg"><div id="bar4" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
+                    <div class="chart-row"><div class="chart-label">5</div><div class="chart-bar-bg"><div id="bar5" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
+                </div>
+
+                <div class="section-sub-bar" style="margin-bottom: 10px;">Streak Tracker Calendar</div>
+                <div class="calendar-matrix-container">
+                    <div id="calendarMonthTitle" class="calendar-month-title">Month Year</div>
+                    <div id="calendarGrid" class="calendar-grid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="countdown-strip-box">
+                    NEXT DAILY PUZZLE RELEASES IN: <span id="midnightCountdownClock" class="countdown-time-digits">00h 00m 00s</span>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -412,6 +589,7 @@
     let gameOver = false;
     let isEndlessMode = false;
     let guessHistoryTracking = []; 
+    let countdownIntervalEngine = null;
 
     function seededRandom(seed) {
         const x = Math.sin(seed++) * 10000;
@@ -441,11 +619,24 @@
         document.getElementById('streakDisplay').innerText = `Streak: ${currentStreak} (Max: ${maxStreak})`;
     }
 
-    function verifyAndManageStreaks(didWinToday) {
+    function verifyAndManageStreaks(didWinToday, guessCount) {
         let currentStreak = parseInt(localStorage.getItem('reindl_streak_current') || '0', 10);
         let maxStreak = parseInt(localStorage.getItem('reindl_streak_max') || '0', 10);
 
+        let totalPlayed = parseInt(localStorage.getItem('reindl_stat_played') || '0', 10);
+        let totalWins = parseInt(localStorage.getItem('reindl_stat_wins') || '0', 10);
+        
+        totalPlayed++;
+        localStorage.setItem('reindl_stat_played', totalPlayed);
+
         if (didWinToday) {
+            totalWins++;
+            localStorage.setItem('reindl_stat_wins', totalWins);
+            
+            let distribution = JSON.parse(localStorage.getItem('reindl_stat_dist') || '{"1":0,"2":0,"3":0,"4":0,"5":0}');
+            distribution[String(guessCount)] = (distribution[String(guessCount)] || 0) + 1;
+            localStorage.setItem('reindl_stat_dist', JSON.stringify(distribution));
+
             currentStreak++;
             if (currentStreak > maxStreak) {
                 maxStreak = currentStreak;
@@ -457,6 +648,117 @@
         localStorage.setItem('reindl_streak_current', currentStreak);
         localStorage.setItem('reindl_streak_max', maxStreak);
         updateStreakUI();
+    }
+
+    function startCountdownTimer() {
+        if (countdownIntervalEngine) clearInterval(countdownIntervalEngine);
+        
+        function updateClock() {
+            const now = new Date();
+            const nextMidnightUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+            const diff = nextMidnightUTC - now.getTime();
+
+            if (diff <= 0) {
+                document.getElementById('midnightCountdownClock').innerText = "00h 00m 00s";
+                clearInterval(countdownIntervalEngine);
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const hStr = String(hours).padStart(2, '0');
+            const mStr = String(minutes).padStart(2, '0');
+            const sStr = String(seconds).padStart(2, '0');
+
+            document.getElementById('midnightCountdownClock').innerText = `${hStr}h ${mStr}m ${sStr}s`;
+        }
+
+        updateClock();
+        countdownIntervalEngine = setInterval(updateClock, 1000);
+    }
+
+    function generateChartDashboard() {
+        let totalPlayed = parseInt(localStorage.getItem('reindl_stat_played') || '0', 10);
+        let totalWins = parseInt(localStorage.getItem('reindl_stat_wins') || '0', 10);
+        let currentStreak = parseInt(localStorage.getItem('reindl_streak_current') || '0', 10);
+        let maxStreak = parseInt(localStorage.getItem('reindl_streak_max') || '0', 10);
+        let distribution = JSON.parse(localStorage.getItem('reindl_stat_dist') || '{"1":0,"2":0,"3":0,"4":0,"5":0}');
+
+        document.getElementById('statPlayed').innerText = totalPlayed;
+        document.getElementById('statWinPct').innerText = totalPlayed > 0 ? Math.round((totalWins / totalPlayed) * 100) + "%" : "0%";
+        document.getElementById('statCurrentStreak').innerText = currentStreak;
+        document.getElementById('statMaxStreak').innerText = maxStreak;
+
+        let counts = Object.values(distribution);
+        let maxCount = Math.max(...counts, 1);
+
+        for (let i = 1; i <= 5; i++) {
+            let currentCount = distribution[String(i)] || 0;
+            let percentWidth = (currentCount / maxCount) * 100;
+            let barFill = document.getElementById(`bar${i}`);
+            
+            barFill.style.width = currentCount > 0 ? `${percentWidth}%` : '0%';
+            barFill.querySelector('.chart-bar-count').innerText = currentCount;
+        }
+
+        renderCalendarMatrix();
+        startCountdownTimer();
+        document.getElementById('statsDashboard').style.display = 'block';
+    }
+
+    function renderCalendarMatrix() {
+        const grid = document.getElementById('calendarGrid');
+        const monthTitle = document.getElementById('calendarMonthTitle');
+        grid.innerHTML = '';
+
+        const now = new Date();
+        const currentYear = now.getUTCFullYear();
+        const currentMonth = now.getUTCMonth(); 
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        monthTitle.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+
+        const headers = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        headers.forEach(h => {
+            const headDiv = document.createElement('div');
+            headDiv.className = 'calendar-day-header';
+            headDiv.innerText = h;
+            grid.appendChild(headDiv);
+        });
+
+        const firstDayInstance = new Date(Date.UTC(currentYear, currentMonth, 1));
+        const startDayOfWeek = firstDayInstance.getUTCDay();
+        const totalDaysInMonth = new Date(Date.UTC(currentYear, currentMonth + 1, 0)).getUTCDate();
+
+        for (let i = 0; i < startDayOfWeek; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'calendar-cell';
+            emptyCell.innerHTML = '&nbsp;';
+            grid.appendChild(emptyCell);
+        }
+
+        for (let day = 1; day <= totalDaysInMonth; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell active-day';
+            cell.innerText = day;
+
+            const mmStr = String(currentMonth + 1).padStart(2, '0');
+            const ddStr = String(day).padStart(2, '0');
+            const loopSeed = parseInt(`${currentYear}${mmStr}${ddStr}`, 10);
+
+            const savedGame = localStorage.getItem(`reindl_daily_${loopSeed}`);
+            if (savedGame) {
+                const state = JSON.parse(savedGame);
+                if (state.win) {
+                    cell.classList.add('status-win');
+                } else {
+                    cell.classList.add('status-loss');
+                }
+            }
+            grid.appendChild(cell);
+        }
     }
 
     function checkPassiveStreakReset() {
@@ -595,6 +897,8 @@
         } else {
             currentWrestlerId = keys[Math.floor(Math.random() * keys.length)];
             guessHistoryTracking = []; 
+            document.getElementById('statsDashboard').style.display = 'none';
+            if (countdownIntervalEngine) clearInterval(countdownIntervalEngine);
         }
         
         currentWrestlerData = WRESTLER_DB[currentWrestlerId];
@@ -822,18 +1126,20 @@
         if (validTargets.includes(userGuessLower)) {
             gameOver = true;
             guessHistoryTracking.push("[ Correct ]");
+            const currentGuessNumber = 6 - remainingGuesses;
             guessInput.disabled = true;
             submitBtn.disabled = true;
             document.getElementById('dropdown').style.display = 'none';
 
             if (!isEndlessMode) {
-                verifyAndManageStreaks(true);
+                verifyAndManageStreaks(true, currentGuessNumber);
                 saveDailyChallengeState(true);
                 showDailyCompletedStatus(true, mainName);
             } else {
                 statusBar.className = "game-status-bar status-correct";
-                statusText.innerHTML = `Correct! It's ${mainName}! <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Puzzle</button>`;
+                statusText.innerHTML = `Correct! It's ${mainName}! [ ${currentGuessNumber}/5 Guesses ] <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Puzzle</button>`;
                 statusCounter.innerText = "Correct!";
+                generateChartDashboard();
             }
         } else {
             remainingGuesses--;
@@ -845,13 +1151,14 @@
                 document.getElementById('dropdown').style.display = 'none';
 
                 if (!isEndlessMode) {
-                    verifyAndManageStreaks(false);
+                    verifyAndManageStreaks(false, 5);
                     saveDailyChallengeState(false);
                     showDailyCompletedStatus(false, mainName);
                 } else {
                     statusBar.className = "game-status-bar status-wrong";
-                    statusText.innerHTML = `Out of guesses. The answer was <strong>${mainName}</strong>. <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
+                    statusText.innerHTML = `Out of guesses. The answer was <strong>${mainName}</strong>. [ Failed ] <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
                     statusCounter.innerText = "Game Over";
+                    generateChartDashboard();
                 }
             } else {
                 statusBar.className = "game-status-bar status-wrong";
@@ -880,21 +1187,26 @@
         statusBar.className = isWin ? "game-status-bar status-correct" : "game-status-bar status-wrong";
         statusCounter.innerText = "Finished";
 
+        const correctAttempts = guessHistoryTracking.length;
+        const scoreTrackerLabel = isWin ? `[ ${correctAttempts}/5 Guesses ]` : `[ Failed ]`;
         const summaryText = guessHistoryTracking.join(" ");
 
         statusText.innerHTML = `
-            ${isWin ? 'Correct!' : 'Game Over!'} The answer was <strong>${mainName}</strong>.<br/>
+            Correct! The answer was <strong>${mainName}</strong>. ${scoreTrackerLabel}<br/>
             Guesses: ${summaryText} 
             <button class="action-link share-btn" onclick="copyDailySharePayload(${isWin})">Copy Results</button>
             <button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode</button>
         `;
+
+        generateChartDashboard();
     }
 
     function copyDailySharePayload(isWin) {
         const seed = getDailySeed();
-        const resultLabel = isWin ? "[ Win ]" : "[ Loss ]";
+        const correctAttempts = guessHistoryTracking.length;
+        const scoreTrackerLabel = isWin ? `${correctAttempts}/5` : "Failed";
         const summaryText = guessHistoryTracking.join(" ");
-        const textToCopy = `REINDL Daily Puzzle ${seed} - ${resultLabel}\nGuesses: ${summaryText}\nPlay here: ${window.location.href}`;
+        const textToCopy = `REINDL Daily Puzzle ${seed} - ${scoreTrackerLabel}\nGuesses: ${summaryText}\nPlay here: ${window.location.href}`;
         
         navigator.clipboard.writeText(textToCopy).then(() => {
             alert("Results copied to clipboard.");
