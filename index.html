@@ -230,8 +230,6 @@
             width: 100%;
             padding: 12px 15px;
             box-sizing: border-box;
-            border: 1px solid #cccccc;
-            background-color: #f9f9f9;
             font-weight: bold;
             font-size: 13px;
             margin-bottom: 10px;
@@ -239,9 +237,9 @@
             justify-content: space-between;
             align-items: center;
         }
-        .status-neutral { border-left: 5px solid #03328a; color: #03328a; }
-        .status-wrong { border-left: 5px solid #cc0000; color: #cc0000; background-color: #fff0f0; }
-        .status-correct { border-left: 5px solid #008800; color: #008800; background-color: #f0fff0; }
+        .status-neutral { border: 1px solid #03328a; color: #03328a; background-color: #f9f9f9; }
+        .status-wrong { border: 2px solid #cc0000; color: #cc0000; background-color: #fff0f0; }
+        .status-correct { border: 2px solid #008800; color: #008800; background-color: #f0fff0; }
         
         .action-link {
             font-size: 11px;
@@ -346,8 +344,8 @@
 
 <div class="page-wrapper">
     <div class="top-bar">
-        <span id="modeIndicator" class="mode-indicator">Daily Challenge</span>
-        <span>Public Edition | Static Javascript Timeline Puzzle Mod</span>
+        <span id="modeIndicator" class="mode-indicator">Daily Game</span>
+        <span>Public Edition | Title History Game</span>
     </div>
 
     <div class="site-banner">
@@ -359,31 +357,31 @@
 
     <div class="breadcrumb-container">
         <div class="breadcrumb-box">
-            REINDL &raquo; Titles Database &raquo; <span id="breadcrumbMode">Daily Global Challenge</span>
+            REINDL &raquo; Titles Database &raquo; <span id="breadcrumbMode">Daily Match Game</span>
         </div>
     </div>
 
     <div class="main-content-body">
         <div class="content-width-restrictor">
             
-            <div class="title-heading">Title History Timeline Verification</div>
+            <div class="title-heading">Wrestler Title History Timeline</div>
             
-            <div class="section-sub-bar">Active Puzzle Parameters</div>
+            <div class="section-sub-bar">Championship Order</div>
 
             <div id="timelineContainer" class="timeline-container">
-                <div class="loading-text">Loading Database Configuration...</div>
+                <div class="loading-text">Loading Game Database...</div>
             </div>
 
-            <div class="section-sub-bar">Submit Identity Guess</div>
+            <div class="section-sub-bar">Your Guess</div>
 
             <div id="statusBar" class="game-status-bar status-neutral">
-                <span id="statusText">Identify the worker based on the championship history sequence above.</span>
+                <span id="statusText">Name the wrestler who held these championships in this exact order.</span>
                 <span id="statusCounter">Guesses Left: 5</span>
             </div>
 
             <div class="input-section">
                 <div class="autocomplete-wrapper">
-                    <input type="text" id="guessInput" placeholder="Search the database for worker identity..." autocomplete="off" oninput="filterDropdown()">
+                    <input type="text" id="guessInput" placeholder="Type name to search database..." autocomplete="off" oninput="filterDropdown()">
                     <div id="dropdown" class="dropdown-box"></div>
                 </div>
                 <button id="submitBtn" onclick="submitGuess()">Search</button>
@@ -394,21 +392,18 @@
 </div>
 
 <script>
-    // Global Engine App Lookups
     let WRESTLER_DB = {};
     let TITLES_METADATA = {};
     let PROMOTION_LOGOS = {};
     let AUTOCOMPLETE_LIST = [];
     
-    // Core Game States
     let currentWrestlerId = null;
     let currentWrestlerData = null;
     let remainingGuesses = 5;
     let gameOver = false;
     let isEndlessMode = false;
-    let dailyTrackingArray = []; // Tracks 🟩 or 🟥 for sharing results
+    let totalAttemptsMade = 0;
 
-    // Seeded Random Number Generator for Global Daily Challenge
     function seededRandom(seed) {
         const x = Math.sin(seed++) * 10000;
         return x - Math.floor(x);
@@ -416,18 +411,16 @@
 
     function getDailySeed() {
         const now = new Date();
-        // Generate yyyymmdd string from UTC values
         const yyyy = now.getUTCFullYear();
         const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
         const dd = String(now.getUTCDate()).padStart(2, '0');
         return parseInt(`${yyyy}${mm}${dd}`, 10);
     }
 
-    // Load Database on Init
     window.addEventListener('DOMContentLoaded', () => {
         fetch('wrestlers_db.json')
             .then(res => {
-                if(!res.ok) throw new Error("Could not find wrestlers_db.json in root folder");
+                if(!res.ok) throw new Error("Could not find wrestlers_db.json file");
                 return res.json();
             })
             .then(data => {
@@ -438,7 +431,7 @@
                 document.getElementById('timelineContainer').innerHTML = `
                     <div class="loading-text" style="color: #cc0000;">
                         Error loading database file: ${err.message}<br/>
-                        Ensure wrestlers_db.json matches your repo root file structure.
+                        Check your folder layout files.
                     </div>`;
                 console.error(err);
             });
@@ -491,42 +484,38 @@
         const savedDaily = localStorage.getItem(`reindl_daily_${seed}`);
 
         if (savedDaily) {
-            // User already finished today's challenge
             const state = JSON.parse(savedDaily);
-            isEndlessMode = true; // Automatically shift them to endless options view
+            isEndlessMode = true; 
             initPuzzle(state.workerId);
             
-            // Force the game over state onto their historical daily asset
             gameOver = true;
             document.getElementById('guessInput').disabled = true;
             document.getElementById('submitBtn').disabled = true;
             
-            // Update Headers/Status bar with copy capabilities
-            updateUIModeHeaders(false, true);
-            showDailyCompletedStatus(state.win, state.mainName, state.history);
+            updateUIModeHeaders();
+            showDailyCompletedStatus(state.win, state.mainName, state.attempts);
         } else {
-            // New day! Pick the standard seeded index global wrestler
             isEndlessMode = false;
-            updateUIModeHeaders(true, false);
-            const keys = Object.keys(WRESTLER_DB).sort(); // Sort keys to guarantee alignment across architectures
+            updateUIModeHeaders();
+            const keys = Object.keys(WRESTLER_DB).sort(); 
             const r = seededRandom(seed);
             const targetIndex = Math.floor(r * keys.length);
             initPuzzle(keys[targetIndex]);
         }
     }
 
-    function updateUIModeHeaders(isDaily, alreadyDone) {
+    function updateUIModeHeaders() {
         const modeIndicator = document.getElementById('modeIndicator');
         const breadcrumbMode = document.getElementById('breadcrumbMode');
         
         if (isEndlessMode) {
             modeIndicator.innerText = "Endless Practice Mode";
             modeIndicator.style.color = "#008800";
-            breadcrumbMode.innerText = "Endless Free Play Mod";
+            breadcrumbMode.innerText = "Endless Free Play";
         } else {
-            modeIndicator.innerText = "Daily Global Challenge";
+            modeIndicator.innerText = "Daily Match Game";
             modeIndicator.style.color = "#cc9900";
-            breadcrumbMode.innerText = "Daily Global Challenge";
+            breadcrumbMode.innerText = "Daily Match Game";
         }
     }
 
@@ -544,7 +533,7 @@
         }
         
         currentWrestlerData = WRESTLER_DB[currentWrestlerId];
-        dailyTrackingArray = [];
+        totalAttemptsMade = 0;
 
         let cleanTimeline = (currentWrestlerData.timeline || []).filter(item => item && item.date);
         cleanTimeline.sort((a, b) => (a.date > b.date) ? 1 : -1);
@@ -568,7 +557,7 @@
         
         const statusBar = document.getElementById('statusBar');
         statusBar.className = "game-status-bar status-neutral";
-        document.getElementById('statusText').innerText = "Identify the worker based on the championship history sequence above.";
+        document.getElementById('statusText').innerText = "Name the wrestler who held these championships in this exact order.";
         document.getElementById('statusCounter').innerText = `Guesses Left: ${remainingGuesses}`;
     }
 
@@ -766,24 +755,24 @@
             }
         });
 
+        totalAttemptsMade++;
+
         if (validTargets.includes(userGuessLower)) {
             gameOver = true;
-            dailyTrackingArray.push("🟩");
             guessInput.disabled = true;
             submitBtn.disabled = true;
             document.getElementById('dropdown').style.display = 'none';
 
             if (!isEndlessMode) {
                 saveDailyChallengeState(true);
-                showDailyCompletedStatus(true, mainName, dailyTrackingArray);
+                showDailyCompletedStatus(true, mainName, totalAttemptsMade);
             } else {
                 statusBar.className = "game-status-bar status-correct";
-                statusText.innerHTML = `Correct! It's ${mainName}! <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Practice Puzzle</button>`;
-                statusCounter.innerText = "Winner!";
+                statusText.innerHTML = `Correct! It's ${mainName}! <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Puzzle</button>`;
+                statusCounter.innerText = "Correct!";
             }
         } else {
             remainingGuesses--;
-            dailyTrackingArray.push("🟥");
             if (remainingGuesses <= 0) {
                 gameOver = true;
                 guessInput.disabled = true;
@@ -792,15 +781,15 @@
 
                 if (!isEndlessMode) {
                     saveDailyChallengeState(false);
-                    showDailyCompletedStatus(false, mainName, dailyTrackingArray);
+                    showDailyCompletedStatus(false, mainName, totalAttemptsMade);
                 } else {
                     statusBar.className = "game-status-bar status-wrong";
-                    statusText.innerHTML = `Out of guesses! The correct answer was <strong>${mainName}</strong>. <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
+                    statusText.innerHTML = `Out of guesses. The answer was <strong>${mainName}</strong>. <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
                     statusCounter.innerText = "Game Over";
                 }
             } else {
                 statusBar.className = "game-status-bar status-wrong";
-                statusText.innerText = "Incorrect choice. Check the sequence timeline and try again!";
+                statusText.innerText = "Incorrect answer. Check the timeline and try again.";
                 statusCounter.innerText = `Guesses Left: ${remainingGuesses}`;
             }
         }
@@ -812,44 +801,42 @@
             workerId: currentWrestlerId,
             mainName: currentWrestlerData.name,
             win: isWin,
-            history: dailyTrackingArray
+            attempts: totalAttemptsMade
         };
         localStorage.setItem(`reindl_daily_${seed}`, JSON.stringify(stateObj));
     }
 
-    function showDailyCompletedStatus(isWin, mainName, historyArray) {
+    function showDailyCompletedStatus(isWin, mainName, totalAttempts) {
         const statusBar = document.getElementById('statusBar');
         const statusText = document.getElementById('statusText');
         const statusCounter = document.getElementById('statusCounter');
 
         statusBar.className = isWin ? "game-status-bar status-correct" : "game-status-bar status-wrong";
-        statusCounter.innerText = isWin ? "Daily Solved!" : "Daily Ended";
+        statusCounter.innerText = isWin ? "Finished" : "Finished";
 
-        const emojiString = historyArray.join("");
-        
         statusText.innerHTML = `
-            ${isWin ? 'Correct! ' : 'Game Over! '} It was <strong>${mainName}</strong>.<br/>
-            Daily Progress: ${emojiString}
-            <button class="action-link share-btn" onclick="copyDailySharePayload('${emojiString}', ${isWin})">📋 Copy Results</button>
-            <button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode ➔</button>
+            ${isWin ? 'Correct!' : 'Game Over!'} The answer was <strong>${mainName}</strong>.<br/>
+            <button class="action-link share-btn" onclick="copyDailySharePayload(${isWin}, ${totalAttempts})">Copy Results</button>
+            <button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode</button>
         `;
     }
 
-    function copyDailySharePayload(emojis, isWin) {
+    function copyDailySharePayload(isWin, totalAttempts) {
         const seed = getDailySeed();
-        const score = isWin ? `${dailyTrackingArray.length}/5` : "X/5";
-        const textToCopy = `REINDL Daily Puzzle ${seed} - Score: ${score}\nSequence: ${emojis}\nPlay here: ${window.location.href}`;
+        const scoreString = isWin ? `Completed in ${totalAttempts}/5 guesses` : "Failed after 5 guesses";
+        const resultLabel = isWin ? "[ Win ]" : "[ Loss ]";
+        const textToCopy = `REINDL Daily Puzzle ${seed} - ${resultLabel}\nScore: ${scoreString}\nPlay here: ${window.location.href}`;
         
         navigator.clipboard.writeText(textToCopy).then(() => {
-            alert("Results copied to clipboard! Share it with others.");
+            alert("Results copied to clipboard.");
         }).catch(err => {
-            console.error("Could not copy status text: ", err);
+            console.error("Could not copy results: ", err);
         });
     }
 
     function switchToEndlessMode() {
         isEndlessMode = true;
-        updateUIModeHeaders(false, false);
+        updateUIModeHeaders();
         triggerNextEndlessPuzzle();
     }
 
