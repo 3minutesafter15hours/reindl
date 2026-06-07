@@ -1137,7 +1137,7 @@
                 showDailyCompletedStatus(true, mainName);
             } else {
                 statusBar.className = "game-status-bar status-correct";
-                statusText.innerHTML = `Correct! It's ${mainName}! [ ${currentGuessNumber}/5 Guesses ] <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Puzzle</button>`;
+                statusText.innerHTML = `Correct! The answer was <strong>${mainName}</strong>.<br/>Guesses: ${currentGuessNumber}/5 <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Puzzle</button>`;
                 statusCounter.innerText = "Correct!";
                 generateChartDashboard();
             }
@@ -1156,7 +1156,7 @@
                     showDailyCompletedStatus(false, mainName);
                 } else {
                     statusBar.className = "game-status-bar status-wrong";
-                    statusText.innerHTML = `Out of guesses. The answer was <strong>${mainName}</strong>. [ Failed ] <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
+                    statusText.innerHTML = `Out of guesses. The answer was <strong>${mainName}</strong>.<br/>Guesses: Failed <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
                     statusCounter.innerText = "Game Over";
                     generateChartDashboard();
                 }
@@ -1188,12 +1188,11 @@
         statusCounter.innerText = "Finished";
 
         const correctAttempts = guessHistoryTracking.length;
-        const scoreTrackerLabel = isWin ? `[ ${correctAttempts}/5 Guesses ]` : `[ Failed ]`;
-        const summaryText = guessHistoryTracking.join(" ");
+        const scoreTrackerLabel = isWin ? `${correctAttempts}/5` : `Failed`;
 
         statusText.innerHTML = `
-            Correct! The answer was <strong>${mainName}</strong>. ${scoreTrackerLabel}<br/>
-            Guesses: ${summaryText} 
+            Correct! The answer was <strong>${mainName}</strong>.<br/>
+            Guesses: ${scoreTrackerLabel} 
             <button class="action-link share-btn" onclick="copyDailySharePayload(${isWin})">Copy Results</button>
             <button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode</button>
         `;
