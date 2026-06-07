@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>REINDL - Title History Game</title>
+    <style>
+        body { 
+            background-color: #000000; 
+            color: #000000; 
+            font-family: Verdana, Arial, Helvetica, sans-serif; 
+            font-size: 13px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #000000;
+            box-sizing: border-box;
+        }
+
+        .top-bar {
+            background-color: #1a1a1a;
+            color: #cccccc;
+            font-size: 11px;
+            text-align: right;
+            padding: 5px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mode-indicator {
+            font-weight: bold;
+            color: #cc9900;
+            text-transform: uppercase;
+        }
+
+        .site-banner {
+            background-color: #022360;
+            border-top: 2px solid #0c439c;
+            border-bottom: 2px solid #010e26;
+            height: 105px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .logo-placeholder {
+            color: #ffffff;
+            font-family: 'Arial Black', Impact, sans-serif;
+            font-size: 38px;
+            letter-spacing: 4px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .logo-sub {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            color: #cccccc;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-top: -5px;
+            text-transform: uppercase;
+        }
+
+        .breadcrumb-container {
+            background-color: #ffffff;
+            padding: 12px 15px 8px 15px;
+            border-bottom: 1px solid #dddddd;
+        }
+        .breadcrumb-box {
+            border: 1px solid #cccccc;
+            padding: 6px 15px;
+            background-color: #ffffff;
+            font-size: 11px;
+            color: #666666;
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        .breadcrumb-box span { color: #03328a; font-weight: bold; }
+
+        .main-content-body {
+            background-color: #ffffff;
+            min-height: 600px;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content-width-restrictor {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .title-heading {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 22px;
+            font-weight: bold;
+            color: #000000;
+            margin: 0 0 25px 0;
+        }
+
+        .section-sub-bar {
+            color: #cc9900;
+            font-size: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid #cc9900;
+            padding-bottom: 4px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .timeline-container { 
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            background-color: #f5f5f5;
+            border: 1px solid #cccccc;
+            padding: 40px;
+            box-sizing: border-box;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .timeline-row {
+            display: grid;
+            grid-template-columns: repeat(4, 185px);
+            column-gap: 45px;
+            width: 100%;
+            justify-content: start;
+        }
+
+        .timeline-node {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 185px;
+            min-height: 100px;
+            margin-bottom: 15px;
+        }
+        
+        .belt-card { 
+            position: relative; 
+            width: 185px; 
+            min-height: 100px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+            border: 1px solid #aaaaaa;
+            background-color: #ffffff;
+            box-sizing: border-box;
+            padding-top: 20px; 
+        }
+        
+        .stacked-belt-img { 
+            max-width: 90%; 
+            max-height: 70px; 
+            object-fit: contain; 
+            margin: auto;
+        }
+        
+        .fallback-text-card { 
+            width: 100%; 
+            font-size: 11px; 
+            font-weight: bold; 
+            padding: 8px; 
+            color: #03328a; 
+            box-sizing: border-box;
+            text-align: center;
+            margin: auto;
+        }
+        
+        .badge-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap; 
+            align-items: stretch;
+            z-index: 1000;
+        }
+
+        .reign-badge { 
+            background-color: #03328a; 
+            color: #ffffff; 
+            font-weight: bold; 
+            font-size: 10px; 
+            padding: 2px 6px; 
+            border-right: 1px solid #aaaaaa;
+            border-bottom: 1px solid #aaaaaa;
+            display: flex;
+            align-items: center;
+        }
+        
+        .promo-badge-img {
+            height: 17px;
+            width: auto;
+            max-width: 45px; 
+            object-fit: contain;
+            border-right: 1px solid #aaaaaa;
+            border-bottom: 1px solid #aaaaaa;
+            background-color: #ffffff;
+            display: block;
+        }
+        
+        .flow-arrow-horizontal { 
+            position: absolute;
+            right: -45px;
+            color: #03328a; 
+            font-size: 20px; 
+            font-weight: bold;
+            user-select: none;
+            width: 45px;
+            text-align: center;
+            z-index: 2000;
+        }
+
+        .game-status-bar {
+            width: 100%;
+            padding: 12px 15px;
+            box-sizing: border-box;
+            border: 1px solid #cccccc;
+            background-color: #f9f9f9;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-neutral { border-left: 5px solid #03328a; color: #03328a; }
+        .status-wrong { border-left: 5px solid #cc0000; color: #cc0000; background-color: #fff0f0; }
+        .status-correct { border-left: 5px solid #008800; color: #008800; background-color: #f0fff0; }
+        
+        .action-link {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #ffffff;
+            background-color: #03328a;
+            padding: 4px 10px;
+            text-decoration: none;
+            cursor: pointer;
+            margin-left: 10px;
+            display: inline-block;
+            border: none;
+            font-weight: bold;
+        }
+        .action-link:hover { background-color: #0c439c; }
+        .action-link.share-btn { background-color: #cc9900; }
+        .action-link.share-btn:hover { background-color: #b38600; }
+        
+        .input-section { 
+            display: flex; 
+            gap: 10px; 
+            width: 100%; 
+            background-color: #f5f5f5;
+            border: 1px solid #cccccc;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        
+        .autocomplete-wrapper { 
+            position: relative; 
+            flex-grow: 1; 
+        }
+        
+        input { 
+            width: 100%; 
+            padding: 10px; 
+            font-size: 13px; 
+            font-family: Verdana, sans-serif;
+            border: 1px solid #cccccc; 
+            background-color: #FFFFFF; 
+            color: #000000; 
+            outline: none; 
+            box-sizing: border-box; 
+        }
+        input:focus { border-color: #03328a; }
+        input:disabled { background-color: #eeeeee; color: #666666; cursor: not-allowed; }
+        
+        .dropdown-box { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            width: 100%; 
+            background-color: #FFFFFF; 
+            border: 1px solid #cccccc; 
+            border-top: none;
+            max-height: 220px; 
+            overflow-y: auto; 
+            z-index: 9999; 
+            display: none;
+            box-sizing: border-box;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .dropdown-item { 
+            padding: 10px 12px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            color: #000000;
+            border-bottom: 1px solid #eeeeee;
+            text-align: left;
+        }
+        .dropdown-item:hover { 
+            background-color: #03328a; 
+            color: #ffffff; 
+        }
+        
+        button { 
+            padding: 10px 24px; 
+            background-color: #03328a; 
+            border: 1px solid #01163d;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            font-weight: bold; 
+            cursor: pointer; 
+            color: #ffffff; 
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        button:hover { background-color: #0c439c; }
+        button:disabled { background-color: #cccccc; border-color: #aaaaaa; cursor: not-allowed; }
+        
+        .loading-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #03328a;
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <div class="top-bar">
+        <span id="modeIndicator" class="mode-indicator">Daily Challenge</span>
+        <span>Public Edition | Static Javascript Timeline Puzzle Mod</span>
+    </div>
+
+    <div class="site-banner">
+        <div>
+            <div class="logo-placeholder">REINDL</div>
+            <div class="logo-sub">The Internet Wrestling Database</div>
+        </div>
+    </div>
+
+    <div class="breadcrumb-container">
+        <div class="breadcrumb-box">
+            REINDL &raquo; Titles Database &raquo; <span id="breadcrumbMode">Daily Global Challenge</span>
+        </div>
+    </div>
+
+    <div class="main-content-body">
+        <div class="content-width-restrictor">
+            
+            <div class="title-heading">Title History Timeline Verification</div>
+            
+            <div class="section-sub-bar">Active Puzzle Parameters</div>
+
+            <div id="timelineContainer" class="timeline-container">
+                <div class="loading-text">Loading Database Configuration...</div>
+            </div>
+
+            <div class="section-sub-bar">Submit Identity Guess</div>
+
+            <div id="statusBar" class="game-status-bar status-neutral">
+                <span id="statusText">Identify the worker based on the championship history sequence above.</span>
+                <span id="statusCounter">Guesses Left: 5</span>
+            </div>
+
+            <div class="input-section">
+                <div class="autocomplete-wrapper">
+                    <input type="text" id="guessInput" placeholder="Search the database for worker identity..." autocomplete="off" oninput="filterDropdown()">
+                    <div id="dropdown" class="dropdown-box"></div>
+                </div>
+                <button id="submitBtn" onclick="submitGuess()">Search</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global Engine App Lookups
+    let WRESTLER_DB = {};
+    let TITLES_METADATA = {};
+    let PROMOTION_LOGOS = {};
+    let AUTOCOMPLETE_LIST = [];
+    
+    // Core Game States
+    let currentWrestlerId = null;
+    let currentWrestlerData = null;
+    let remainingGuesses = 5;
+    let gameOver = false;
+    let isEndlessMode = false;
+    let dailyTrackingArray = []; // Tracks 🟩 or 🟥 for sharing results
+
+    // Seeded Random Number Generator for Global Daily Challenge
+    function seededRandom(seed) {
+        const x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    function getDailySeed() {
+        const now = new Date();
+        // Generate yyyymmdd string from UTC values
+        const yyyy = now.getUTCFullYear();
+        const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+        const dd = String(now.getUTCDate()).padStart(2, '0');
+        return parseInt(`${yyyy}${mm}${dd}`, 10);
+    }
+
+    // Load Database on Init
+    window.addEventListener('DOMContentLoaded', () => {
+        fetch('wrestlers_db.json')
+            .then(res => {
+                if(!res.ok) throw new Error("Could not find wrestlers_db.json in root folder");
+                return res.json();
+            })
+            .then(data => {
+                parseAndFilterDatabase(data);
+                checkDailyStatusAndLoad();
+            })
+            .catch(err => {
+                document.getElementById('timelineContainer').innerHTML = `
+                    <div class="loading-text" style="color: #cc0000;">
+                        Error loading database file: ${err.message}<br/>
+                        Ensure wrestlers_db.json matches your repo root file structure.
+                    </div>`;
+                console.error(err);
+            });
+    });
+
+    function parseAndFilterDatabase(rawData) {
+        const wrestlersSource = rawData.wrestlers || {};
+        TITLES_METADATA = rawData.titles_metadata || {};
+        PROMOTION_LOGOS = rawData.promotion_logos || {};
+
+        let aliasCounts = {};
+
+        for (const [workerId, data] of Object.entries(wrestlersSource)) {
+            if (data.timeline && data.timeline.length >= 2) {
+                WRESTLER_DB[workerId] = data;
+                const aliases = data.aliases || [data.name];
+                aliases.forEach(alias => {
+                    if (alias) {
+                        const cleanAlias = alias.trim();
+                        if (cleanAlias) {
+                            aliasCounts[cleanAlias] = (aliasCounts[cleanAlias] || 0) + 1;
+                        }
+                    }
+                });
+            }
+        }
+
+        let itemsSet = new Set();
+        for (const [workerId, data] of Object.entries(WRESTLER_DB)) {
+            const mainName = data.name;
+            const aliases = data.aliases || [mainName];
+            
+            aliases.forEach(alias => {
+                if (!alias) return;
+                const cleanAlias = alias.trim();
+                if (!cleanAlias) return;
+
+                let displayName = cleanAlias;
+                if (aliasCounts[cleanAlias] > 1 && cleanAlias.toLowerCase() !== mainName.toLowerCase()) {
+                    displayName = `${cleanAlias} -> ${mainName}`;
+                }
+                itemsSet.add(displayName);
+            });
+        }
+        AUTOCOMPLETE_LIST = Array.from(itemsSet).sort();
+    }
+
+    function checkDailyStatusAndLoad() {
+        const seed = getDailySeed();
+        const savedDaily = localStorage.getItem(`reindl_daily_${seed}`);
+
+        if (savedDaily) {
+            // User already finished today's challenge
+            const state = JSON.parse(savedDaily);
+            isEndlessMode = true; // Automatically shift them to endless options view
+            initPuzzle(state.workerId);
+            
+            // Force the game over state onto their historical daily asset
+            gameOver = true;
+            document.getElementById('guessInput').disabled = true;
+            document.getElementById('submitBtn').disabled = true;
+            
+            // Update Headers/Status bar with copy capabilities
+            updateUIModeHeaders(false, true);
+            showDailyCompletedStatus(state.win, state.mainName, state.history);
+        } else {
+            // New day! Pick the standard seeded index global wrestler
+            isEndlessMode = false;
+            updateUIModeHeaders(true, false);
+            const keys = Object.keys(WRESTLER_DB).sort(); // Sort keys to guarantee alignment across architectures
+            const r = seededRandom(seed);
+            const targetIndex = Math.floor(r * keys.length);
+            initPuzzle(keys[targetIndex]);
+        }
+    }
+
+    function updateUIModeHeaders(isDaily, alreadyDone) {
+        const modeIndicator = document.getElementById('modeIndicator');
+        const breadcrumbMode = document.getElementById('breadcrumbMode');
+        
+        if (isEndlessMode) {
+            modeIndicator.innerText = "Endless Practice Mode";
+            modeIndicator.style.color = "#008800";
+            breadcrumbMode.innerText = "Endless Free Play Mod";
+        } else {
+            modeIndicator.innerText = "Daily Global Challenge";
+            modeIndicator.style.color = "#cc9900";
+            breadcrumbMode.innerText = "Daily Global Challenge";
+        }
+    }
+
+    function initPuzzle(targetId = null) {
+        const keys = Object.keys(WRESTLER_DB);
+        if (keys.length === 0) {
+            document.getElementById('timelineContainer').innerHTML = '<div class="loading-text">Error: Empty database.</div>';
+            return;
+        }
+
+        if (targetId) {
+            currentWrestlerId = targetId;
+        } else {
+            currentWrestlerId = keys[Math.floor(Math.random() * keys.length)];
+        }
+        
+        currentWrestlerData = WRESTLER_DB[currentWrestlerId];
+        dailyTrackingArray = [];
+
+        let cleanTimeline = (currentWrestlerData.timeline || []).filter(item => item && item.date);
+        cleanTimeline.sort((a, b) => (a.date > b.date) ? 1 : -1);
+        
+        const processedTimeline = compressTimeline(cleanTimeline);
+
+        const rowSize = 4;
+        let timelineRows = [];
+        for (let i = 0; i < processedTimeline.length; i += rowSize) {
+            timelineRows.push(processedTimeline.slice(i, i + rowSize));
+        }
+
+        renderTimelineView(timelineRows);
+
+        remainingGuesses = 5;
+        gameOver = false;
+        
+        document.getElementById('guessInput').value = "";
+        document.getElementById('guessInput').disabled = false;
+        document.getElementById('submitBtn').disabled = false;
+        
+        const statusBar = document.getElementById('statusBar');
+        statusBar.className = "game-status-bar status-neutral";
+        document.getElementById('statusText').innerText = "Identify the worker based on the championship history sequence above.";
+        document.getElementById('statusCounter').innerText = `Guesses Left: ${remainingGuesses}`;
+    }
+
+    function parseDate(dateStr, fallbackDate) {
+        if (!dateStr) return fallbackDate;
+        const cleanStr = dateStr.trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(cleanStr) || /^\d{4}\/\d{2}\/\d{2}$/.test(cleanStr)) {
+            const d = new Date(cleanStr.replace(/\//g, '-'));
+            if (!isNaN(d.getTime())) return d;
+        }
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(cleanStr)) {
+            const d = new Date(cleanStr.replace(/ /g, 'T'));
+            if (!isNaN(d.getTime())) return d;
+        }
+        if (/^\d{4}$/.test(cleanStr)) {
+            const d = new Date(cleanStr + '-01-01');
+            if (!isNaN(d.getTime())) return d;
+        }
+        return fallbackDate;
+    }
+
+    function resolveTitleName(titleId, winDateStr) {
+        const meta = TITLES_METADATA[String(titleId)] || {};
+        const nameHistory = meta.name_history || [];
+        if (nameHistory.length === 0) return `Title ID ${titleId}`;
+        const winDate = parseDate(winDateStr, new Date(0));
+        for (let entry of nameHistory) {
+            const start = parseDate(entry.start, new Date(0));
+            const end = parseDate(entry.end, new Date(8640000000000000));
+            if (winDate >= start && winDate <= end) return entry.name;
+        }
+        return nameHistory[0].name || `Title ID ${titleId}`;
+    }
+
+    function resolveActivePromotions(titleId, winDateStr) {
+        const meta = TITLES_METADATA[String(titleId)] || {};
+        const promoHistory = meta.promotion_history || [];
+        if (promoHistory.length === 0) return [];
+        const winDate = parseDate(winDateStr, new Date(0));
+        let matches = [];
+        for (let entry of promoHistory) {
+            const start = parseDate(entry.start, new Date(0));
+            const end = parseDate(entry.end, new Date(8640000000000000));
+            if (winDate >= start && winDate <= end) {
+                const pid = entry.promotion_id;
+                if (pid && pid !== "Unknown") matches.push(pid);
+            }
+        }
+        if (matches.length > 0) return Array.from(new Set(matches));
+        let nearestEntry = null; let nearestDistance = null;
+        for (let entry of promoHistory) {
+            const start = parseDate(entry.start, new Date(0));
+            const end = parseDate(entry.end, new Date(8640000000000000));
+            let distance = winDate < start ? Math.abs(start - winDate) / 86400000 : (winDate > end ? Math.abs(winDate - end) / 86400000 : 0);
+            if (nearestDistance === null || distance < nearestDistance) { nearestDistance = distance; nearestEntry = entry; }
+        }
+        if (nearestEntry && nearestEntry.promotion_id && nearestEntry.promotion_id !== "Unknown") return [nearestEntry.promotion_id];
+        return [];
+    }
+
+    function getActiveLogosForReign(promotionIds, winDateStr) {
+        let logoFilenames = []; if (!promotionIds || !winDateStr) return logoFilenames;
+        const winDate = parseDate(winDateStr, new Date());
+        promotionIds.forEach(pId => {
+            const pIdStr = String(pId);
+            if (PROMOTION_LOGOS[pIdStr]) {
+                let matchedAnyLogo = false;
+                for (let logoEntry of PROMOTION_LOGOS[pIdStr]) {
+                    const start = parseDate(logoEntry.date_start, new Date(0));
+                    const end = parseDate(logoEntry.date_end, new Date(8640000000000000));
+                    if (winDate >= start && winDate <= end) {
+                        const url = logoEntry.logo_url || "";
+                        if (url) {
+                            const filename = url.substring(url.lastIndexOf('/') + 1);
+                            if (!logoFilenames.includes(filename)) { logoFilenames.push(filename); matchedAnyLogo = true; }
+                        }
+                    }
+                }
+                if (!matchedAnyLogo && PROMOTION_LOGOS[pIdStr].length > 0) {
+                    const fallbackEntry = PROMOTION_LOGOS[pIdStr][0];
+                    const url = fallbackEntry.logo_url || "";
+                    if (url) {
+                        const filename = url.substring(url.lastIndexOf('/') + 1);
+                        if (!logoFilenames.includes(filename)) logoFilenames.push(filename);
+                    }
+                }
+            }
+        });
+        return logoFilenames;
+    }
+
+    function compressTimeline(rawTimeline) {
+        let compressed = [];
+        rawTimeline.forEach(item => {
+            if (!item || typeof item !== 'object') return;
+            const titleId = String(item.title_id || "");
+            const winDate = item.date || "";
+            if (!titleId || !winDate) return;
+            const filename = `title_${titleId}.png`;
+            const titleDisplayName = resolveTitleName(titleId, winDate);
+            const promotions = resolveActivePromotions(titleId, winDate);
+            if (compressed.length > 0 && compressed[compressed.length - 1].title_id === titleId) {
+                compressed[compressed.length - 1].count += 1;
+            } else {
+                const promoLogoFilenames = getActiveLogosForReign(promotions, winDate);
+                compressed.push({ title_id: titleId, filename: filename, title_name: titleDisplayName, promo_logo_urls: promoLogoFilenames, count: 1 });
+            }
+        });
+        return compressed;
+    }
+
+    function renderTimelineView(rows) {
+        const container = document.getElementById('timelineContainer');
+        container.innerHTML = "";
+        rows.forEach((row, rowIndex) => {
+            const isLastRow = (rowIndex === rows.length - 1);
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'timeline-row';
+            row.forEach((item, itemIndex) => {
+                const isLastItem = (itemIndex === row.length - 1);
+                const nodeDiv = document.createElement('div');
+                nodeDiv.className = 'timeline-node';
+                let badgesMarkup = "";
+                item.promo_logo_urls.forEach(gifFile => { badgesMarkup += `<img src="static/logos/${gifFile}" class="promo-badge-img">`; });
+                if (item.count > 1) badgesMarkup += `<div class="reign-badge">${item.count}x</div>`;
+                const imgUrl = `static/${item.filename}`;
+                nodeDiv.innerHTML = `
+                    <div class="belt-card">
+                        <div class="badge-wrapper">${badgesMarkup}</div>
+                        <img src="${imgUrl}" class="stacked-belt-img" alt="${item.title_name}" onerror="handleImageFallback(this, '${item.title_name}')">
+                    </div>`;
+                if (!(isLastRow && isLastItem)) {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'flow-arrow-horizontal'; arrow.innerText = '➔';
+                    nodeDiv.appendChild(arrow);
+                }
+                rowDiv.appendChild(nodeDiv);
+            });
+            container.appendChild(rowDiv);
+        });
+    }
+
+    function handleImageFallback(imgElement, titleName) {
+        const parent = imgElement.parentNode;
+        if(parent) {
+            const textFallback = document.createElement('div');
+            textFallback.className = 'fallback-text-card'; textFallback.innerText = titleName;
+            parent.replaceChild(textFallback, imgElement);
+        }
+    }
+
+    function filterDropdown() {
+        if (gameOver) return;
+        const input = document.getElementById('guessInput').value.toLowerCase();
+        const dropdown = document.getElementById('dropdown');
+        dropdown.innerHTML = '';
+        if (!input) { dropdown.style.display = 'none'; return; }
+        const matches = AUTOCOMPLETE_LIST.filter(name => name.toLowerCase().includes(input)).slice(0, 8);
+        if (matches.length > 0) {
+            dropdown.style.display = 'block';
+            matches.forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item'; item.innerText = name;
+                item.onclick = () => { document.getElementById('guessInput').value = name; dropdown.style.display = 'none'; };
+                dropdown.appendChild(item);
+            });
+        } else { dropdown.style.display = 'none'; }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.autocomplete-wrapper')) document.getElementById('dropdown').style.display = 'none';
+    });
+
+    function submitGuess() {
+        if (gameOver || !currentWrestlerData) return;
+        
+        const guessInput = document.getElementById('guessInput');
+        const val = guessInput.value.trim();
+        if (!val) return;
+
+        const statusBar = document.getElementById('statusBar');
+        const statusText = document.getElementById('statusText');
+        const statusCounter = document.getElementById('statusCounter');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const userGuessLower = val.toLowerCase();
+        const mainName = currentWrestlerData.name;
+        
+        let validTargets = [];
+        const aliases = currentWrestlerData.aliases || [mainName];
+        aliases.forEach(alias => {
+            if(alias) {
+                validTargets.push(alias.toLowerCase().trim());
+                validTargets.push(`${alias.toLowerCase().trim()} -> ${mainName.toLowerCase().trim()}`);
+            }
+        });
+
+        if (validTargets.includes(userGuessLower)) {
+            gameOver = true;
+            dailyTrackingArray.push("🟩");
+            guessInput.disabled = true;
+            submitBtn.disabled = true;
+            document.getElementById('dropdown').style.display = 'none';
+
+            if (!isEndlessMode) {
+                saveDailyChallengeState(true);
+                showDailyCompletedStatus(true, mainName, dailyTrackingArray);
+            } else {
+                statusBar.className = "game-status-bar status-correct";
+                statusText.innerHTML = `Correct! It's ${mainName}! <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Practice Puzzle</button>`;
+                statusCounter.innerText = "Winner!";
+            }
+        } else {
+            remainingGuesses--;
+            dailyTrackingArray.push("🟥");
+            if (remainingGuesses <= 0) {
+                gameOver = true;
+                guessInput.disabled = true;
+                submitBtn.disabled = true;
+                document.getElementById('dropdown').style.display = 'none';
+
+                if (!isEndlessMode) {
+                    saveDailyChallengeState(false);
+                    showDailyCompletedStatus(false, mainName, dailyTrackingArray);
+                } else {
+                    statusBar.className = "game-status-bar status-wrong";
+                    statusText.innerHTML = `Out of guesses! The correct answer was <strong>${mainName}</strong>. <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
+                    statusCounter.innerText = "Game Over";
+                }
+            } else {
+                statusBar.className = "game-status-bar status-wrong";
+                statusText.innerText = "Incorrect choice. Check the sequence timeline and try again!";
+                statusCounter.innerText = `Guesses Left: ${remainingGuesses}`;
+            }
+        }
+    }
+
+    function saveDailyChallengeState(isWin) {
+        const seed = getDailySeed();
+        const stateObj = {
+            workerId: currentWrestlerId,
+            mainName: currentWrestlerData.name,
+            win: isWin,
+            history: dailyTrackingArray
+        };
+        localStorage.setItem(`reindl_daily_${seed}`, JSON.stringify(stateObj));
+    }
+
+    function showDailyCompletedStatus(isWin, mainName, historyArray) {
+        const statusBar = document.getElementById('statusBar');
+        const statusText = document.getElementById('statusText');
+        const statusCounter = document.getElementById('statusCounter');
+
+        statusBar.className = isWin ? "game-status-bar status-correct" : "game-status-bar status-wrong";
+        statusCounter.innerText = isWin ? "Daily Solved!" : "Daily Ended";
+
+        const emojiString = historyArray.join("");
+        
+        statusText.innerHTML = `
+            ${isWin ? 'Correct! ' : 'Game Over! '} It was <strong>${mainName}</strong>.<br/>
+            Daily Progress: ${emojiString}
+            <button class="action-link share-btn" onclick="copyDailySharePayload('${emojiString}', ${isWin})">📋 Copy Results</button>
+            <button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode ➔</button>
+        `;
+    }
+
+    function copyDailySharePayload(emojis, isWin) {
+        const seed = getDailySeed();
+        const score = isWin ? `${dailyTrackingArray.length}/5` : "X/5";
+        const textToCopy = `REINDL Daily Puzzle ${seed} - Score: ${score}\nSequence: ${emojis}\nPlay here: ${window.location.href}`;
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("Results copied to clipboard! Share it with others.");
+        }).catch(err => {
+            console.error("Could not copy status text: ", err);
+        });
+    }
+
+    function switchToEndlessMode() {
+        isEndlessMode = true;
+        updateUIModeHeaders(false, false);
+        triggerNextEndlessPuzzle();
+    }
+
+    function triggerNextEndlessPuzzle() {
+        initPuzzle(null);
+    }
+</script>
+</body>
+</html>
