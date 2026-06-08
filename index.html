@@ -354,11 +354,43 @@
             margin-top: 15px;
             display: none;
         }
+
+        /* Mode Selector Sub-Tabs */
+        .stats-mode-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #dddddd;
+            padding-bottom: 1px;
+        }
+        .stats-tab-btn {
+            background-color: #e5e5e5;
+            color: #444444;
+            border: 1px solid #cccccc;
+            border-bottom: none;
+            padding: 6px 16px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .stats-tab-btn.active {
+            background-color: #ffffff;
+            color: #03328a;
+            border-color: #dddddd;
+            border-top: 3px solid #03328a;
+            padding-bottom: 8px;
+            margin-bottom: -2px;
+        }
+
         .stats-summary-grid {
             display: flex;
             justify-content: space-around;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: #ffffff;
+            padding: 15px 0;
+            border: 1px solid #e0e0e0;
         }
         .stat-metric-box .metric-val {
             font-size: 22px;
@@ -370,43 +402,74 @@
             color: #666666;
             text-transform: uppercase;
         }
-        .chart-distribution-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+
+        /* Vertical Difficulty Split Container Layout */
+        .difficulty-tiers-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
             margin-bottom: 25px;
         }
-        .chart-row {
-            display: flex;
-            align-items: center;
-            font-size: 12px;
+        .tier-panel-card {
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            padding: 12px;
+            border-top: 4px solid #666666;
         }
-        .chart-label {
-            width: 20px;
+        .tier-panel-card.tier-easy { border-top-color: #28a745; }
+        .tier-panel-card.tier-normal { border-top-color: #007bff; }
+        .tier-panel-card.tier-hard { border-top-color: #dc3545; }
+        .tier-panel-card.tier-lunatic { border-top-color: #7000cc; }
+
+        .tier-card-heading {
+            font-size: 11px;
             font-weight: bold;
+            text-transform: uppercase;
+            color: #333333;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
         }
-        .chart-bar-bg {
-            flex-grow: 1;
-            background-color: #eeeeee;
-            height: 18px;
-            margin-left: 10px;
-            position: relative;
-        }
-        .chart-bar-fill {
-            background-color: #03328a;
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s ease;
+
+        /* Vertical Grid Distribution Columns CSS */
+        .vertical-chart-frame {
             display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 110px;
+            padding: 0 10px;
+            border-bottom: 2px solid #555555;
+            background: #fafafa;
+        }
+        .vertical-chart-column-node {
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            padding-right: 5px;
-            box-sizing: border-box;
+            width: 14%;
+            height: 100%;
         }
-        .chart-bar-count {
+        .vertical-bar-fill-track {
+            width: 100%;
+            background-color: #03328a;
+            min-height: 0px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 3px;
+            box-sizing: border-box;
+            transition: height 0.4s ease;
+        }
+        .vertical-bar-count-label {
             color: #ffffff;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .vertical-axis-title {
             font-size: 10px;
             font-weight: bold;
+            color: #444444;
+            margin-top: 4px;
         }
 
         /* Calendar Matrix Grid Layout */
@@ -479,6 +542,18 @@
             margin-left: 5px;
             letter-spacing: 1px;
         }
+
+        /* End of Round Difficulty Badge Styling */
+        .difficulty-badge {
+            background-color: #666666;
+            color: #ffffff;
+            font-size: 11px;
+            padding: 2px 6px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -495,7 +570,7 @@
     <div class="site-banner">
         <div>
             <div class="logo-placeholder">REINDL</div>
-            <div class="logo-sub">Will I Polish This More? Yea</div>
+            <div class="logo-sub">I hate coding</div>
         </div>
     </div>
 
@@ -531,8 +606,13 @@
                 <button id="submitBtn" onclick="submitGuess()">Search</button>
             </div>
 
+            <!-- Redesigned Split Difficulty Stats Profile Panel -->
             <div id="statsDashboard" class="stats-dashboard">
-                <div class="section-sub-bar" style="margin-bottom: 15px;">Your Lifetime History Stats</div>
+                <div class="stats-mode-tabs">
+                    <button id="tabDaily" class="stats-tab-btn active" onclick="toggleStatsModeDisplay('daily')">Daily Mode</button>
+                    <button id="tabEndless" class="stats-tab-btn" onclick="toggleStatsModeDisplay('endless')">Endless Mode</button>
+                </div>
+
                 <div class="stats-summary-grid">
                     <div class="stat-metric-box">
                         <div id="statPlayed" class="metric-val">0</div>
@@ -552,19 +632,61 @@
                     </div>
                 </div>
 
-                <div class="chart-distribution-container">
-                    <div class="chart-row"><div class="chart-label">1</div><div class="chart-bar-bg"><div id="bar1" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
-                    <div class="chart-row"><div class="chart-label">2</div><div class="chart-bar-bg"><div id="bar2" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
-                    <div class="chart-row"><div class="chart-label">3</div><div class="chart-bar-bg"><div id="bar3" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
-                    <div class="chart-row"><div class="chart-label">4</div><div class="chart-bar-bg"><div id="bar4" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
-                    <div class="chart-row"><div class="chart-label">5</div><div class="chart-bar-bg"><div id="bar5" class="chart-bar-fill"><span class="chart-bar-count">0</span></div></div></div>
+                <div class="section-sub-bar" style="margin-bottom: 15px;">Guess Distribution By Difficulty</div>
+                
+                <!-- Vertical Split Difficulty Chart Block -->
+                <div class="difficulty-tiers-grid">
+                    <!-- EASY PANEL -->
+                    <div class="tier-panel-card tier-easy">
+                        <div class="tier-card-heading">Easy (0-2)</div>
+                        <div class="vertical-chart-frame" id="frame-easy">
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-easy-1"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">1</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-easy-2"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">2</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-easy-3"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">3</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-easy-4"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">4</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-easy-5"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">5</div></div>
+                        </div>
+                    </div>
+                    <!-- NORMAL PANEL -->
+                    <div class="tier-panel-card tier-normal">
+                        <div class="tier-card-heading">Normal (1-3)</div>
+                        <div class="vertical-chart-frame" id="frame-normal">
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-normal-1"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">1</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-normal-2"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">2</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-normal-3"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">3</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-normal-4"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">4</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-normal-5"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">5</div></div>
+                        </div>
+                    </div>
+                    <!-- HARD PANEL -->
+                    <div class="tier-panel-card tier-hard">
+                        <div class="tier-card-heading">Hard (2-5)</div>
+                        <div class="vertical-chart-frame" id="frame-hard">
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-hard-1"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">1</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-hard-2"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">2</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-hard-3"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">3</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-hard-4"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">4</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-hard-5"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">5</div></div>
+                        </div>
+                    </div>
+                    <!-- LUNATIC PANEL -->
+                    <div class="tier-panel-card tier-lunatic">
+                        <div class="tier-card-heading">Lunatic (4+)</div>
+                        <div class="vertical-chart-frame" id="frame-lunatic">
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-lunatic-1"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">1</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-lunatic-2"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">2</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-lunatic-3"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">3</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-lunatic-4"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">4</div></div>
+                            <div class="vertical-chart-column-node"><div class="vertical-bar-fill-track" id="bar-lunatic-5"><span class="vertical-bar-count-label">0</span></div><div class="vertical-axis-title">5</div></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="section-sub-bar" style="margin-bottom: 10px;">Streak Tracker Calendar</div>
-                <div class="calendar-matrix-container">
-                    <div id="calendarMonthTitle" class="calendar-month-title">Month Year</div>
-                    <div id="calendarGrid" class="calendar-grid">
-                        <!-- Populated by JavaScript -->
+                <div id="calendarSectionWrapper">
+                    <div class="section-sub-bar" style="margin-bottom: 10px;">Streak Tracker Calendar</div>
+                    <div class="calendar-matrix-container">
+                        <div id="calendarMonthTitle" class="calendar-month-title">Month Year</div>
+                        <div id="calendarGrid" class="calendar-grid"></div>
                     </div>
                 </div>
 
@@ -588,6 +710,7 @@
     let remainingGuesses = 5;
     let gameOver = false;
     let isEndlessMode = false;
+    let activeStatsViewTab = 'daily'; 
     let guessHistoryTracking = []; 
     let countdownIntervalEngine = null;
 
@@ -613,41 +736,66 @@
         return parseInt(`${yyyy}${mm}${dd}`, 10);
     }
 
+function getWrestlerDifficultyTierName(score) {
+        // If a score lands squarely in an overlap, we evaluate from strict hard to easy 
+        // to assign the single best fit for the UI statistics panel.
+        if (score > 4.5) return 'lunatic';
+        if (score > 3.0) return 'hard';
+        if (score >= 2.0) {
+            // Overlap zone (2 to 3) -> can split to normal or hard. 
+            // We favor 'normal' for the lower half, 'hard' for the upper half.
+            return score >= 2.5 ? 'hard' : 'normal';
+        }
+        if (score >= 1.0) {
+            // Overlap zone (1 to 2) -> can split to easy or normal.
+            return score >= 1.5 ? 'normal' : 'easy';
+        }
+        return 'easy';
+    }
+
+    updateStreakUI();
+
     function updateStreakUI() {
         let currentStreak = parseInt(localStorage.getItem('reindl_streak_current') || '0', 10);
         let maxStreak = parseInt(localStorage.getItem('reindl_streak_max') || '0', 10);
         document.getElementById('streakDisplay').innerText = `Streak: ${currentStreak} (Max: ${maxStreak})`;
     }
 
-    function verifyAndManageStreaks(didWinToday, guessCount) {
-        let currentStreak = parseInt(localStorage.getItem('reindl_streak_current') || '0', 10);
-        let maxStreak = parseInt(localStorage.getItem('reindl_streak_max') || '0', 10);
+    function verifyAndManageGameTracking(didWinToday, guessCount) {
+        const score = currentWrestlerData.normalizedScore || 5.0;
+        const tier = getWrestlerDifficultyTierName(score);
+        const prefix = isEndlessMode ? 'endless' : 'daily';
 
-        let totalPlayed = parseInt(localStorage.getItem('reindl_stat_played') || '0', 10);
-        let totalWins = parseInt(localStorage.getItem('reindl_stat_wins') || '0', 10);
+        let played = parseInt(localStorage.getItem(`reindl_${prefix}_played`) || '0', 10);
+        let wins = parseInt(localStorage.getItem(`reindl_${prefix}_wins`) || '0', 10);
         
-        totalPlayed++;
-        localStorage.setItem('reindl_stat_played', totalPlayed);
+        played++;
+        localStorage.setItem(`reindl_${prefix}_played`, played);
 
         if (didWinToday) {
-            totalWins++;
-            localStorage.setItem('reindl_stat_wins', totalWins);
+            wins++;
+            localStorage.setItem(`reindl_${prefix}_wins`, wins);
             
-            let distribution = JSON.parse(localStorage.getItem('reindl_stat_dist') || '{"1":0,"2":0,"3":0,"4":0,"5":0}');
+            let distKey = `reindl_${prefix}_dist_${tier}`;
+            let distribution = JSON.parse(localStorage.getItem(distKey) || '{"1":0,"2":0,"3":0,"4":0,"5":0}');
             distribution[String(guessCount)] = (distribution[String(guessCount)] || 0) + 1;
-            localStorage.setItem('reindl_stat_dist', JSON.stringify(distribution));
-
-            currentStreak++;
-            if (currentStreak > maxStreak) {
-                maxStreak = currentStreak;
-            }
-        } else {
-            currentStreak = 0;
+            localStorage.setItem(distKey, JSON.stringify(distribution));
         }
 
-        localStorage.setItem('reindl_streak_current', currentStreak);
-        localStorage.setItem('reindl_streak_max', maxStreak);
-        updateStreakUI();
+        if (!isEndlessMode) {
+            let currentStreak = parseInt(localStorage.getItem('reindl_streak_current') || '0', 10);
+            let maxStreak = parseInt(localStorage.getItem('reindl_streak_max') || '0', 10);
+            
+            if (didWinToday) {
+                currentStreak++;
+                if (currentStreak > maxStreak) maxStreak = currentStreak;
+            } else {
+                currentStreak = 0;
+            }
+            localStorage.setItem('reindl_streak_current', currentStreak);
+            localStorage.setItem('reindl_streak_max', maxStreak);
+            updateStreakUI();
+        }
     }
 
     function startCountdownTimer() {
@@ -668,42 +816,66 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            const hStr = String(hours).padStart(2, '0');
-            const mStr = String(minutes).padStart(2, '0');
-            const sStr = String(seconds).padStart(2, '0');
-
-            document.getElementById('midnightCountdownClock').innerText = `${hStr}h ${mStr}m ${sStr}s`;
+            document.getElementById('midnightCountdownClock').innerText = 
+                `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
         }
 
         updateClock();
         countdownIntervalEngine = setInterval(updateClock, 1000);
     }
 
+    function toggleStatsModeDisplay(mode) {
+        activeStatsViewTab = mode;
+        document.getElementById('tabDaily').classList.toggle('active', mode === 'daily');
+        document.getElementById('tabEndless').classList.toggle('active', mode === 'endless');
+        
+        document.getElementById('calendarSectionWrapper').style.display = (mode === 'daily') ? 'block' : 'none';
+        
+        generateChartDashboard();
+    }
+
     function generateChartDashboard() {
-        let totalPlayed = parseInt(localStorage.getItem('reindl_stat_played') || '0', 10);
-        let totalWins = parseInt(localStorage.getItem('reindl_stat_wins') || '0', 10);
-        let currentStreak = parseInt(localStorage.getItem('reindl_streak_current') || '0', 10);
-        let maxStreak = parseInt(localStorage.getItem('reindl_streak_max') || '0', 10);
-        let distribution = JSON.parse(localStorage.getItem('reindl_stat_dist') || '{"1":0,"2":0,"3":0,"4":0,"5":0}');
+        const prefix = activeStatsViewTab;
+        
+        let totalPlayed = parseInt(localStorage.getItem(`reindl_${prefix}_played`) || '0', 10);
+        let totalWins = parseInt(localStorage.getItem(`reindl_${prefix}_wins`) || '0', 10);
+        
+        let currentStreak = 0;
+        let maxStreak = 0;
+        
+        if (prefix === 'daily') {
+            currentStreak = parseInt(localStorage.getItem('reindl_streak_current') || '0', 10);
+            maxStreak = parseInt(localStorage.getItem('reindl_streak_max') || '0', 10);
+        }
 
         document.getElementById('statPlayed').innerText = totalPlayed;
         document.getElementById('statWinPct').innerText = totalPlayed > 0 ? Math.round((totalWins / totalPlayed) * 100) + "%" : "0%";
-        document.getElementById('statCurrentStreak').innerText = currentStreak;
-        document.getElementById('statMaxStreak').innerText = maxStreak;
+        document.getElementById('statCurrentStreak').innerText = prefix === 'daily' ? currentStreak : '-';
+        document.getElementById('statMaxStreak').innerText = prefix === 'daily' ? maxStreak : '-';
 
-        let counts = Object.values(distribution);
-        let maxCount = Math.max(...counts, 1);
+        const TiersList = ['easy', 'normal', 'hard', 'lunatic'];
+        
+        let globalMax = 1;
+        TiersList.forEach(t => {
+            let dist = JSON.parse(localStorage.getItem(`reindl_${prefix}_dist_${t}`) || '{"1":0,"2":0,"3":0,"4":0,"5":0}');
+            Object.values(dist).forEach(v => { if(v > globalMax) globalMax = v; });
+        });
 
-        for (let i = 1; i <= 5; i++) {
-            let currentCount = distribution[String(i)] || 0;
-            let percentWidth = (currentCount / maxCount) * 100;
-            let barFill = document.getElementById(`bar${i}`);
-            
-            barFill.style.width = currentCount > 0 ? `${percentWidth}%` : '0%';
-            barFill.querySelector('.chart-bar-count').innerText = currentCount;
+        TiersList.forEach(t => {
+            let dist = JSON.parse(localStorage.getItem(`reindl_${prefix}_dist_${t}`) || '{"1":0,"2":0,"3":0,"4":0,"5":0}');
+            for (let i = 1; i <= 5; i++) {
+                let currentCount = dist[String(i)] || 0;
+                let percentHeight = (currentCount / globalMax) * 100;
+                let barFill = document.getElementById(`bar-${t}-${i}`);
+                
+                barFill.style.height = currentCount > 0 ? `${percentHeight}%` : '0%';
+                barFill.querySelector('.vertical-bar-count-label').innerText = currentCount;
+            }
+        });
+
+        if (prefix === 'daily') {
+            renderCalendarMatrix();
         }
-
-        renderCalendarMatrix();
         startCountdownTimer();
         document.getElementById('statsDashboard').style.display = 'block';
     }
@@ -744,18 +916,11 @@
             cell.className = 'calendar-cell active-day';
             cell.innerText = day;
 
-            const mmStr = String(currentMonth + 1).padStart(2, '0');
-            const ddStr = String(day).padStart(2, '0');
-            const loopSeed = parseInt(`${currentYear}${mmStr}${ddStr}`, 10);
-
+            const loopSeed = parseInt(`${currentYear}${String(currentMonth + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`, 10);
             const savedGame = localStorage.getItem(`reindl_daily_${loopSeed}`);
             if (savedGame) {
                 const state = JSON.parse(savedGame);
-                if (state.win) {
-                    cell.classList.add('status-win');
-                } else {
-                    cell.classList.add('status-loss');
-                }
+                cell.classList.add(state.win ? 'status-win' : 'status-loss');
             }
             grid.appendChild(cell);
         }
@@ -771,14 +936,224 @@
         if (!playedToday) {
             if (playedYesterday) {
                 const prevData = JSON.parse(playedYesterday);
-                if (!prevData.win) {
-                    localStorage.setItem('reindl_streak_current', '0');
-                }
+                if (!prevData.win) localStorage.setItem('reindl_streak_current', '0');
             } else {
                 localStorage.setItem('reindl_streak_current', '0');
             }
         }
         updateStreakUI();
+    }
+
+/* Stardom-Inversion Difficulty Algorithm
+   - Core: Accumulates visibility weight across all title reigns.
+   - Heavy weight (WWE/AEW/NJPW top titles) reduces final difficulty score.
+   - Enhanced: Utilizes an Adjusted Era Floor Bracket to ensure historical 
+     legends maintain realistic difficulty scores instead of bottoming out.
+   - Cluster-Defense: Increases difficulty if a worker accumulates too many 
+     reigns within a rolling 30-day window (e.g., 5+ reigns close together).
+   - Volume Compression: Prevents regional/territorial spam from scaling infinitely.
+*/
+function getWrestlerDifficultyScore(workerData) {
+    if (!workerData.timeline || workerData.timeline.length === 0) return 10.0;
+    
+    let totalStardomWeight = 0;
+    let validReignsCount = 0;
+    let yearsArray = [];
+    let promotionSum = 0;
+    let reignTimestamps = [];
+
+    // 1. Accumulate Career Visibility Weight
+    workerData.timeline.forEach(item => {
+        if (item && item.title_id) {
+            const meta = TITLES_METADATA[String(item.title_id)] || {};
+            
+            const rawTitleDiff = typeof meta.difficulty !== 'undefined' ? parseFloat(meta.difficulty) : 5.0;
+            const titleStardomWeight = Math.max(0.1, 10.0 - rawTitleDiff); 
+            
+            let promoMultiplier = 1.0;
+            if (meta.promotion_id) {
+                const promoMeta = PROMOTIONS_METADATA[String(meta.promotion_id)] || {};
+                if (typeof promoMeta.difficulty !== 'undefined') {
+                    const rawPromoDiff = parseFloat(promoMeta.difficulty);
+                    promotionSum += rawPromoDiff;
+                    promoMultiplier = Math.max(0.1, 10.0 - rawPromoDiff);
+                }
+            }
+
+            totalStardomWeight += (titleStardomWeight * promoMultiplier);
+            validReignsCount++;
+
+            if (item.date) {
+                const cleanDateStr = item.date.trim().replace(/\//g, '-');
+                let parsedYear = NaN;
+                let parsedMonth = 1;
+                let parsedDay = 15;
+
+                if (cleanDateStr.includes('-')) {
+                    const dateParts = cleanDateStr.split('-');
+                    parsedYear = parseInt(dateParts[0], 10);
+                    if (dateParts.length > 1) parsedMonth = parseInt(dateParts[1], 10);
+                    if (dateParts.length > 2) parsedDay = parseInt(dateParts[2], 10);
+                } else {
+                    const jsDate = new Date(cleanDateStr);
+                    parsedYear = jsDate.getUTCFullYear();
+                    parsedMonth = jsDate.getUTCMonth() + 1;
+                    parsedDay = jsDate.getUTCDate();
+                }
+
+                if (!isNaN(parsedYear)) {
+                    yearsArray.push(parsedYear);
+                    
+                    if (!isNaN(parsedMonth) && !isNaN(parsedDay)) {
+                        const timestampMs = Date.UTC(parsedYear, parsedMonth - 1, parsedDay);
+                        reignTimestamps.push(timestampMs);
+                    }
+                }
+            }
+        }
+    });
+    
+    if (validReignsCount === 0) return 10.0;
+    
+    // Diminishing Returns Volume Brake:
+    if (validReignsCount > 25) {
+        let volumeCompression = 1.0 - (Math.log(validReignsCount / 25.0) * 0.15);
+        volumeCompression = Math.max(0.35, volumeCompression);
+        totalStardomWeight *= volumeCompression;
+    }
+
+    // Log-Balanced Rolling 30-Day Window Clustering Defense
+    if (reignTimestamps.length >= 5) {
+        reignTimestamps.sort((a, b) => a - b);
+        let maxClusterCount = 0;
+        const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
+        for (let i = 0; i < reignTimestamps.length; i++) {
+            const startDate = reignTimestamps[i];
+            let clusterCount = 0;
+            
+            for (let j = i; j < reignTimestamps.length; j++) {
+                if (reignTimestamps[j] - startDate <= thirtyDaysMs) {
+                    clusterCount++;
+                } else {
+                    break;
+                }
+            }
+            if (clusterCount > maxClusterCount) {
+                maxClusterCount = clusterCount;
+            }
+        }
+
+        if (maxClusterCount >= 5) {
+            // Uses log-scaling to curb massive drops, capped at a protective floor of 0.55
+            let clusterPenalty = 1.0 - (Math.log(maxClusterCount - 3) * 0.22);
+            clusterPenalty = Math.max(0.55, clusterPenalty);
+            totalStardomWeight *= clusterPenalty;
+        }
+    }
+    
+    // 2. Inversion Transformation with Dynamic Spread Adjustment
+    let logStardom = Math.log1p(totalStardomWeight);
+    let baseDifficulty = 10.0 - (logStardom * 1.35);
+    
+    // 3. Era-Based Protected Floor Bracket
+    let absoluteFloor = 0.5; 
+    if (yearsArray.length > 0) {
+        yearsArray.sort((a, b) => b - a);
+        const mostRecentTitleYear = yearsArray[0];
+
+        if (mostRecentTitleYear <= 1975) {
+            absoluteFloor = 5.5; 
+        } else if (mostRecentTitleYear <= 1985) {
+            absoluteFloor = 4.8; 
+        } else if (mostRecentTitleYear <= 1995) {
+            absoluteFloor = 3.5; 
+        } else if (mostRecentTitleYear <= 2010) {
+            absoluteFloor = 1.8; 
+        }
+    }
+    
+    let finalScore = Math.max(absoluteFloor, baseDifficulty);
+    return Math.max(0.1, Math.min(10.0, finalScore));
+}
+
+function normalizeAllWrestlerScores(wrestlersList) {
+    if (wrestlersList.length === 0) return wrestlersList;
+
+    let rawScores = wrestlersList.map(w => getWrestlerDifficultyScore(w.data));
+    let minScore = Math.min(...rawScores);
+    let maxScore = Math.max(...rawScores);
+
+    if (maxScore === minScore) {
+        return wrestlersList.map(w => ({ name: w.name, score: 5.5 }));
+    }
+
+    return wrestlersList.map((w, index) => {
+        let raw = rawScores[index];
+        let normalized = 0.1 + ((raw - minScore) / (maxScore - minScore)) * (10.0 - 0.1);
+        return {
+            name: w.name,
+            score: Math.round(normalized * 100) / 100
+        };
+    });
+}
+
+function normalizeAllWrestlerScores(wrestlersList) {
+    if (wrestlersList.length === 0) return wrestlersList;
+
+    // 1. Calculate all the raw scores first
+    let rawScores = wrestlersList.map(w => getWrestlerDifficultyScore(w.data));
+    let minScore = Math.min(...rawScores);
+    let maxScore = Math.max(...rawScores);
+
+    // Guard against a divide-by-zero if everyone somehow gets the exact same score
+    if (maxScore === minScore) {
+        return wrestlersList.map(w => ({ name: w.name, score: 5.0 }));
+    }
+
+    // 2. Map and stretch the values between 0.1 and 9.9
+    return wrestlersList.map((w, index) => {
+        let raw = rawScores[index];
+        
+        // MIN/MAX Stretching Formula adjusted for 0.1 min and 9.9 max
+        let normalized = 0.1 + ((raw - minScore) / (maxScore - minScore)) * (9.9 - 0.1);
+        
+        return {
+            name: w.name,
+            score: Math.round(normalized * 100) / 100 // Rounds to 2 decimal places
+        };
+    });
+}
+
+function getWrestlerPoolsByDifficulty() {
+    const pools = { easy: [], normal: [], hard: [], lunatic: [] };
+    
+    Object.keys(WRESTLER_DB).forEach(workerId => {
+        const data = WRESTLER_DB[workerId];
+        // Read the cached stretched 0.1 - 9.9 score we generated on load
+        const score = data.normalizedScore || 5.0; 
+        
+        // Match the bracket limits defined in your HTML layout elements:
+        // Easy (0 to 2)
+        if (score >= 0 && score <= 2.0) pools.easy.push(workerId);
+        
+        // Normal (1 to 3)
+        if (score >= 1.0 && score <= 3.0) pools.normal.push(workerId);
+        
+        // Hard (2 to 5)
+        if (score >= 2.0 && score <= 5.0) pools.hard.push(workerId);
+        
+        // Lunatic (4+)
+        if (score >= 4.0) pools.lunatic.push(workerId);
+    });
+    return pools;
+}
+
+    function pickDifficultyTier(randomValue) {
+        if (randomValue < 0.25) return 'easy';
+        if (randomValue < 0.60) return 'normal';
+        if (randomValue < 0.85) return 'hard';
+        return 'lunatic';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -802,47 +1177,52 @@
             });
     });
 
-    function parseAndFilterDatabase(rawData) {
-        const wrestlersSource = rawData.wrestlers || {};
-        TITLES_METADATA = rawData.titles_metadata || {};
-        PROMOTION_LOGOS = rawData.promotion_logos || {};
+function parseAndFilterDatabase(rawData) {
+    const wrestlersSource = rawData.wrestlers || {};
+    TITLES_METADATA = rawData.titles_metadata || {};
+    PROMOTION_LOGOS = rawData.promotion_logos || {};
+    let aliasCounts = {};
 
-        let aliasCounts = {};
+    // 1. Build your core temporary array for the normalization function
+    let tempWrestlerList = [];
 
-        for (const [workerId, data] of Object.entries(wrestlersSource)) {
-            if (data.timeline && data.timeline.length >= 4) {
-                WRESTLER_DB[workerId] = data;
-                const aliases = data.aliases || [data.name];
-                aliases.forEach(alias => {
-                    if (alias) {
-                        const cleanAlias = alias.trim();
-                        if (cleanAlias) {
-                            aliasCounts[cleanAlias] = (aliasCounts[cleanAlias] || 0) + 1;
-                        }
-                    }
-                });
-            }
-        }
-
-        let itemsSet = new Set();
-        for (const [workerId, data] of Object.entries(WRESTLER_DB)) {
-            const mainName = data.name;
-            const aliases = data.aliases || [mainName];
+    for (const [workerId, data] of Object.entries(wrestlersSource)) {
+        if (data.timeline && data.timeline.length >= 4) { 
+            // Keep track of the ID alongside the object data
+            tempWrestlerList.push({ id: workerId, name: data.name, data: data });
             
-            aliases.forEach(alias => {
-                if (!alias) return;
-                const cleanAlias = alias.trim();
-                if (!cleanAlias) return;
-
-                let displayName = cleanAlias;
-                if (aliasCounts[cleanAlias] > 1 && cleanAlias.toLowerCase() !== mainName.toLowerCase()) {
-                    displayName = `${cleanAlias} -> ${mainName}`;
+            (data.aliases || [data.name]).forEach(alias => {
+                if (alias) {
+                    const cleanAlias = alias.trim();
+                    if (cleanAlias) aliasCounts[cleanAlias] = (aliasCounts[cleanAlias] || 0) + 1;
                 }
-                itemsSet.add(displayName);
             });
         }
-        AUTOCOMPLETE_LIST = Array.from(itemsSet).sort();
     }
+
+    // 2. Run the Min/Max Stretched Normalization over everything!
+    let normalizedScoresList = normalizeAllWrestlerScores(tempWrestlerList);
+
+    // 3. Map the stretched scores back into your main WRESTLER_DB
+    tempWrestlerList.forEach((w, index) => {
+        // Save the final stretched score directly to the wrestler's data profile
+        w.data.normalizedScore = normalizedScoresList[index].score; 
+        WRESTLER_DB[w.id] = w.data;
+    });
+
+    // 4. Leave your autocomplete processing exactly as it was
+    let itemsSet = new Set();
+    for (const [workerId, data] of Object.entries(WRESTLER_DB)) {
+        const mainName = data.name;
+        (data.aliases || [mainName]).forEach(alias => {
+            if (!alias) return;
+            const cleanAlias = alias.trim();
+            if (!cleanAlias) return;
+            itemsSet.add(aliasCounts[cleanAlias] > 1 && cleanAlias.toLowerCase() !== mainName.toLowerCase() ? `${cleanAlias} -> ${mainName}` : cleanAlias);
+        });
+    }
+    AUTOCOMPLETE_LIST = Array.from(itemsSet).sort();
+}
 
     function checkDailyStatusAndLoad() {
         const seed = getDailySeed();
@@ -858,15 +1238,20 @@
             document.getElementById('guessInput').disabled = true;
             document.getElementById('submitBtn').disabled = true;
             
+            activeStatsViewTab = 'daily';
             updateUIModeHeaders();
             showDailyCompletedStatus(state.win, state.mainName);
         } else {
             isEndlessMode = false;
+            activeStatsViewTab = 'daily';
             updateUIModeHeaders();
-            const keys = Object.keys(WRESTLER_DB).sort(); 
-            const r = seededRandom(seed);
-            const targetIndex = Math.floor(r * keys.length);
-            initPuzzle(keys[targetIndex]);
+            
+            const pools = getWrestlerPoolsByDifficulty();
+            const rolledTier = pickDifficultyTier(seededRandom(seed));
+            const targetPool = pools[rolledTier].length > 0 ? pools[rolledTier] : Object.keys(WRESTLER_DB);
+            
+            const targetIndex = Math.floor(seededRandom(seed + 1) * targetPool.sort().length);
+            initPuzzle(targetPool[targetIndex]);
         }
     }
 
@@ -895,7 +1280,11 @@
         if (targetId) {
             currentWrestlerId = targetId;
         } else {
-            currentWrestlerId = keys[Math.floor(Math.random() * keys.length)];
+            const pools = getWrestlerPoolsByDifficulty();
+            const rolledTier = pickDifficultyTier(Math.random());
+            const targetPool = pools[rolledTier].length > 0 ? pools[rolledTier] : keys;
+            
+            currentWrestlerId = targetPool[Math.floor(Math.random() * targetPool.length)];
             guessHistoryTracking = []; 
             document.getElementById('statsDashboard').style.display = 'none';
             if (countdownIntervalEngine) clearInterval(countdownIntervalEngine);
@@ -907,15 +1296,12 @@
         cleanTimeline.sort((a, b) => (a.date > b.date) ? 1 : -1);
         
         const processedTimeline = compressTimeline(cleanTimeline);
-
-        const rowSize = 4;
         let timelineRows = [];
-        for (let i = 0; i < processedTimeline.length; i += rowSize) {
-            timelineRows.push(processedTimeline.slice(i, i + rowSize));
+        for (let i = 0; i < processedTimeline.length; i += 4) {
+            timelineRows.push(processedTimeline.slice(i, i + 4));
         }
 
         renderTimelineView(timelineRows);
-
         remainingGuesses = 5;
         gameOver = false;
         
@@ -923,8 +1309,7 @@
         document.getElementById('guessInput').disabled = false;
         document.getElementById('submitBtn').disabled = false;
         
-        const statusBar = document.getElementById('statusBar');
-        statusBar.className = "game-status-bar status-neutral";
+        document.getElementById('statusBar').className = "game-status-bar status-neutral";
         document.getElementById('statusText').innerText = "Name the wrestler who held these championships in this exact order.";
         document.getElementById('statusCounter').innerText = `Guesses Left: ${remainingGuesses}`;
     }
@@ -986,36 +1371,35 @@
         return [];
     }
 
-    function getActiveLogosForReign(promotionIds, winDateStr) {
-        let logoFilenames = []; if (!promotionIds || !winDateStr) return logoFilenames;
-        const winDate = parseDate(winDateStr, new Date());
-        promotionIds.forEach(pId => {
-            const pIdStr = String(pId);
-            if (PROMOTION_LOGOS[pIdStr]) {
-                let matchedAnyLogo = false;
-                for (let logoEntry of PROMOTION_LOGOS[pIdStr]) {
-                    const start = parseDate(logoEntry.date_start, new Date(0));
-                    const end = parseDate(logoEntry.date_end, new Date(8640000000000000));
-                    if (winDate >= start && winDate <= end) {
-                        const url = logoEntry.logo_url || "";
-                        if (url) {
-                            const filename = url.substring(url.lastIndexOf('/') + 1);
-                            if (!logoFilenames.includes(filename)) { logoFilenames.push(filename); matchedAnyLogo = true; }
-                        }
-                    }
-                }
-                if (!matchedAnyLogo && PROMOTION_LOGOS[pIdStr].length > 0) {
-                    const fallbackEntry = PROMOTION_LOGOS[pIdStr][0];
-                    const url = fallbackEntry.logo_url || "";
-                    if (url) {
-                        const filename = url.substring(url.lastIndexOf('/') + 1);
-                        if (!logoFilenames.includes(filename)) logoFilenames.push(filename);
-                    }
-                }
-            }
-        });
-        return logoFilenames;
-    }
+	function getActiveLogosForReign(promotionIds, winDateStr) {
+		let logoFilenames = []; 
+		if (!promotionIds || !winDateStr) return logoFilenames;
+		const winDate = parseDate(winDateStr, new Date());
+		
+		promotionIds.forEach(pId => {
+			const pIdStr = String(pId);
+			const promoData = PROMOTION_LOGOS[pIdStr];
+
+			// Access the 'timeline' array specifically
+			if (promoData && Array.isArray(promoData.timeline)) {
+				for (let logoEntry of promoData.timeline) {
+					const start = parseDate(logoEntry.date_start, new Date(0));
+					const end = parseDate(logoEntry.date_end, new Date(8640000000000000));
+					
+					if (winDate >= start && winDate <= end) {
+						const url = logoEntry.logo_url || "";
+						if (url) {
+							const filename = url.substring(url.lastIndexOf('/') + 1);
+							if (!logoFilenames.includes(filename)) { 
+								logoFilenames.push(filename); 
+							}
+						}
+					}
+				}
+			}
+		});
+		return logoFilenames;
+	}
 
     function compressTimeline(rawTimeline) {
         let compressed = [];
@@ -1052,10 +1436,13 @@
                 item.promo_logo_urls.forEach(gifFile => { badgesMarkup += `<img src="static/logos/${gifFile}" class="promo-badge-img">`; });
                 if (item.count > 1) badgesMarkup += `<div class="reign-badge">${item.count}x</div>`;
                 const imgUrl = `static/${item.filename}`;
+                
+                const safeTitleName = item.title_name.replace(/'/g, "&apos;");
+
                 nodeDiv.innerHTML = `
                     <div class="belt-card">
                         <div class="badge-wrapper">${badgesMarkup}</div>
-                        <img src="${imgUrl}" class="stacked-belt-img" alt="${item.title_name}" onerror="handleImageFallback(this, '${item.title_name}')">
+                        <img src="${imgUrl}" class="stacked-belt-img" alt="${safeTitleName}" onerror="handleImageFallback(this, '${safeTitleName}')">
                     </div>`;
                 if (!(isLastRow && isLastItem)) {
                     const arrow = document.createElement('div');
@@ -1115,8 +1502,7 @@
         const mainName = currentWrestlerData.name;
         
         let validTargets = [];
-        const aliases = currentWrestlerData.aliases || [mainName];
-        aliases.forEach(alias => {
+        (currentWrestlerData.aliases || [mainName]).forEach(alias => {
             if(alias) {
                 validTargets.push(alias.toLowerCase().trim());
                 validTargets.push(`${alias.toLowerCase().trim()} -> ${mainName.toLowerCase().trim()}`);
@@ -1131,16 +1517,16 @@
             submitBtn.disabled = true;
             document.getElementById('dropdown').style.display = 'none';
 
-            if (!isEndlessMode) {
-                verifyAndManageStreaks(true, currentGuessNumber);
-                saveDailyChallengeState(true);
-                showDailyCompletedStatus(true, mainName);
-            } else {
-                statusBar.className = "game-status-bar status-correct";
-                statusText.innerHTML = `Correct! The answer was <strong>${mainName}</strong>.<br/>Guesses: ${currentGuessNumber}/5 <button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Puzzle</button>`;
-                statusCounter.innerText = "Correct!";
-                generateChartDashboard();
-            }
+            verifyAndManageGameTracking(true, currentGuessNumber);
+            if (!isEndlessMode) saveDailyChallengeState(true);
+            
+            const diffScore = getWrestlerDifficultyScore(currentWrestlerData).toFixed(2);
+            statusBar.className = "game-status-bar status-correct";
+            statusText.innerHTML = `Correct! The answer was <strong>${mainName}</strong>. <span class="difficulty-badge">Diff: ${diffScore}</span><br/>Guesses: ${currentGuessNumber}/5 ` + 
+                (isEndlessMode ? `<button class="action-link" onclick="triggerNextEndlessPuzzle()">Next Puzzle</button>` : `<button class="action-link share-btn" onclick="copyDailySharePayload(true)">Copy Results</button><button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode</button>`);
+            statusCounter.innerText = "Correct!";
+            
+            toggleStatsModeDisplay(isEndlessMode ? 'endless' : 'daily');
         } else {
             remainingGuesses--;
             guessHistoryTracking.push("[ Incorrect ]");
@@ -1150,16 +1536,16 @@
                 submitBtn.disabled = true;
                 document.getElementById('dropdown').style.display = 'none';
 
-                if (!isEndlessMode) {
-                    verifyAndManageStreaks(false, 5);
-                    saveDailyChallengeState(false);
-                    showDailyCompletedStatus(false, mainName);
-                } else {
-                    statusBar.className = "game-status-bar status-wrong";
-                    statusText.innerHTML = `Out of guesses. The answer was <strong>${mainName}</strong>.<br/>Guesses: Failed <button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>`;
-                    statusCounter.innerText = "Game Over";
-                    generateChartDashboard();
-                }
+                verifyAndManageGameTracking(false, 5);
+                if (!isEndlessMode) saveDailyChallengeState(false);
+                
+                const diffScore = (currentWrestlerData.normalizedScore || 5.0).toFixed(2);
+                statusBar.className = "game-status-bar status-wrong";
+                statusText.innerHTML = `Out of guesses. The answer was <strong>${mainName}</strong>. <span class="difficulty-badge">Diff: ${diffScore}</span><br/>Guesses: Failed ` +
+                    (isEndlessMode ? `<button class="action-link" onclick="triggerNextEndlessPuzzle()">Try Another</button>` : `<button class="action-link share-btn" onclick="copyDailySharePayload(false)">Copy Results</button><button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode</button>`);
+                statusCounter.innerText = "Game Over";
+                
+                toggleStatsModeDisplay(isEndlessMode ? 'endless' : 'daily');
             } else {
                 statusBar.className = "game-status-bar status-wrong";
                 statusText.innerText = "Incorrect answer. Check the timeline and try again.";
@@ -1170,13 +1556,12 @@
 
     function saveDailyChallengeState(isWin) {
         const seed = getDailySeed();
-        const stateObj = {
+        localStorage.setItem(`reindl_daily_${seed}`, JSON.stringify({
             workerId: currentWrestlerId,
             mainName: currentWrestlerData.name,
             win: isWin,
             history: guessHistoryTracking
-        };
-        localStorage.setItem(`reindl_daily_${seed}`, JSON.stringify(stateObj));
+        }));
     }
 
     function showDailyCompletedStatus(isWin, mainName) {
@@ -1187,25 +1572,23 @@
         statusBar.className = isWin ? "game-status-bar status-correct" : "game-status-bar status-wrong";
         statusCounter.innerText = "Finished";
 
-        const correctAttempts = guessHistoryTracking.length;
-        const scoreTrackerLabel = isWin ? `${correctAttempts}/5` : `Failed`;
+        const scoreTrackerLabel = isWin ? `${guessHistoryTracking.length}/5` : `Failed`;
+        const diffScore = (currentWrestlerData.normalizedScore || 5.0).toFixed(2);
 
         statusText.innerHTML = `
-            Correct! The answer was <strong>${mainName}</strong>.<br/>
+            Correct! The answer was <strong>${mainName}</strong>. <span class="difficulty-badge">Diff: ${diffScore}</span><br/>
             Guesses: ${scoreTrackerLabel} 
             <button class="action-link share-btn" onclick="copyDailySharePayload(${isWin})">Copy Results</button>
             <button class="action-link" onclick="switchToEndlessMode()">Endless Practice Mode</button>
         `;
 
-        generateChartDashboard();
+        toggleStatsModeDisplay('daily');
     }
 
     function copyDailySharePayload(isWin) {
         const seed = getDailySeed();
-        const correctAttempts = guessHistoryTracking.length;
-        const scoreTrackerLabel = isWin ? `${correctAttempts}/5` : "Failed";
-        const summaryText = guessHistoryTracking.join(" ");
-        const textToCopy = `REINDL Daily Puzzle ${seed} - ${scoreTrackerLabel}\nGuesses: ${summaryText}\nPlay here: ${window.location.href}`;
+        const scoreTrackerLabel = isWin ? `${guessHistoryTracking.length}/5` : "Failed";
+        const textToCopy = `REINDL Daily Puzzle ${seed} - ${scoreTrackerLabel}\nGuesses: ${guessHistoryTracking.join(" ")}\nPlay here: ${window.location.href}`;
         
         navigator.clipboard.writeText(textToCopy).then(() => {
             alert("Results copied to clipboard.");
